@@ -108,6 +108,9 @@ def post_process(mask: np.ndarray) -> np.ndarray:
 
 def remove(
     data: Union[bytes, PILImage, np.ndarray],
+    use_custom_model: bool = False,
+    bucket_name: str = None,
+    blob_name: str = None,
     alpha_matting: bool = False,
     alpha_matting_foreground_threshold: int = 240,
     alpha_matting_background_threshold: int = 10,
@@ -130,7 +133,10 @@ def remove(
         raise ValueError("Input type {} is not supported.".format(type(data)))
 
     if session is None:
-        session = new_session("u2net")
+        if use_custom_model:
+            session = new_session("u2net", bucket_name, blob_name)
+        else:
+            session = new_session("u2net")
 
     masks = session.predict(img)
     cutouts = []
